@@ -1,15 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es2018",
+    "incremental": true,
+    "tsBuildInfoFile": "./.tsbuildinfo",
+    "target": "es2016",
     "module": "commonjs",
     "outDir": "./dist",
-    "jsx": "preserve",
-    "strict": true,
     "esModuleInterop": true,
-    "noImplicitAny": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "lib": ["es2018", "esnext.asynciterable"]
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
   },
-  "exclude": ["node_modules"]
+  "ts-node": {
+		"transpileOnly": true,
+		"files": true,
+		"experimentalResolver": true
+	}
 }

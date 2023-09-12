@@ -1,89 +1,39 @@
-import { buildSchema } from "graphql";
-import express from "express";
-import { graphqlHTTP } from "express-graphql";
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from "@apollo/server/standalone";
+// import { GraphQLError } from "graphql";
+// import { userInterfaces } from "./interfaces";
+import { typeDefs } from "./schemas/index.schemas";
+import { resolvers } from "./resolvers/index.resolvers";
+import * as repositories from "./db/index.db";
+import { ServerContext } from "./interfaces/global.interfaces";
 
-const users = [
-  { id: 1, name: "John Doe", email: "johndoe@gmail.com" },
-  { id: 2, name: "Jane Doe", email: "janedoe@gmail.com" },
-  { id: 3, name: "Mike Doe", email: "mikedoe@gmail.com" },
-];
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+});
 
-const schema = buildSchema(`
-    input UserInput {
-        email: String!
-        name: String!
-    }
-
-    type User {
-        id: Int!
-        name: String!
-        email: String!
-    }
-
-    type Mutation {
-        createUser(input: UserInput): User
-        updateUser(id: Int!, input: UserInput): User
-    }
-
-    type Query {
-        getUser(id: String): User
-        getUsers: [User]
-    }
-`);
-
-type User = {
-  id: number;
-  name: string;
-  email: string;
-};
-
-type UserInput = Pick<User, "email" | "name">;
-
-const getUser = (args: { id: number }): User | undefined => {
-  return users.find((u) => u.id === args.id);
-};
-
-const getUsers = (): User[] => users;
-
-const createUser = (args: { input: UserInput }): User => {
-  const user = {
-    id: users.length + 1,
-    ...args.input,
-  };
-  users.push(user);
-
-  return user;
-};
-
-const updateUser = (args: { user: User }): User => {
-  const index = users.findIndex((u) => u.id === args.user.id);
-  const targetUser = users[index];
-
-  if (targetUser) users[index] = args.user;
-
-  return targetUser;
-};
-
-const root = {
-  getUser,
-  getUsers,
-  createUser,
-  updateUser,
-};
-
-const app = express();
-
-app.use(
-  "/graphql",
-  graphqlHTTP({
-    schema: schema,
-    rootValue: root,
-    graphiql: true,
-  }),
-);
-
-const PORT = 8000;
-
-app.listen(PORT);
-
-console.log(`Running a GraphQL API server at http://localhost:${PORT}/graphql`);
+startStandaloneServer(server, {
+  context: async (): Promise<ServerContext> => {
+    // // get the user token from the headers
+    // const token = req.headers.authorization || "";
+    // // try to retrieve a user with the token
+    // const user = getUser(token);
+    // // optionally block the user
+    // // we could also check user roles/permissions here
+    // if (!user)
+    //   // throwing a `GraphQLError` here allows us to specify an HTTP status code,
+    //   // standard `Error`s will have a 500 status code by default
+    //   throw new GraphQLError("User is not authenticated", {
+    //     extensions: {
+    //       code: "UNAUTHENTICATED",
+    //       http: { status: 401 },
+    //     },
+    //   });
+    // // add the user to the context
+    // return { user };
+    // console.log(req.headers.authorization);
+    return { repositories };
+  },
+}).then(({ url }) => {
+  console.log(`🚀 Server listening at: ${url}`);
+});
