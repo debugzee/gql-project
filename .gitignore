@@ -1,5 +1,26 @@
+# dependencies
 /**/node_modules
-/**/.vscode
+
+# next.js
+/**/.next/
+/**/out/
+
+# debug
+/**/npm-debug.log*
+
+# production
+/**/build
 /**/dist
-/**/.tsbuildinfo
+
+# IDD
+/**/.vscode
 /**/.idea
+
+# misc
+.DS_Store
+
+# local env files
+/**/.env*.local
+
+# typescript
+/**/.tsbuildinfo
